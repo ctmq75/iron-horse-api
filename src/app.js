@@ -4,6 +4,9 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
+const memberService = require('./MemberService.js')
+const jsonBodyParser = express.json()
+
 
 const app = express()
 
@@ -15,9 +18,24 @@ app.use(morgan(morganOption))
 app.use(helmet())
 app.use(cors())
 
-app.get('/', (req, res) => {
+
+
+app.get('/api', (req, res) => {
     res.send('Hello, world!')
 })
+
+app.post('/api/mailinglist', jsonBodyParser, (req, res, next) => {
+  const { full_name, email } = req.body
+  const newUser = { full_name, email }
+  console.log(newUser)
+  return memberService.insertMember(
+    req.app.get('db'),
+    newUser
+  )
+
+  res
+  .send('You have syccessfully been added to the mailing list!');
+});
 
  app.use(function errorHandler(error, req, res, next) {
        let response
