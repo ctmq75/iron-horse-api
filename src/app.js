@@ -25,16 +25,24 @@ app.get('/api', (req, res) => {
 })
 
 app.post('/api/mailinglist', jsonBodyParser, (req, res, next) => {
+  if(!req.body.email){
+    return res.status(400).send({
+      error: { message: `both fields are required` }
+    })
+  }
   const { full_name, email } = req.body
   const newUser = { full_name, email }
   console.log(newUser)
-  return memberService.insertMember(
+  memberService.insertMember(
     req.app.get('db'),
     newUser
   )
+  .then(() => {
 
   res
-  .send('You have syccessfully been added to the mailing list!');
+  .status(201)
+  .send( 'You have syccessfully been added to the mailing list!');
+}).catch(next)
 });
 
  app.use(function errorHandler(error, req, res, next) {
